@@ -11,9 +11,8 @@ It includes **user authentication**, **personalized search history**, and a clea
 
 - 🔐 User login and signup (Flask + SQLite)  
 - 🎵 Search songs by entering partial lyrics  
-- 🕒 Saves user search history  
 - 🌙 Light/Dark theme toggle  
-- 🎧 Displays song name, artist, album art, and preview  
+- 🎧 Displays song name, artist and album art
 - 🔗 Direct Spotify link integration  
 
 ---
