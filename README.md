@@ -1,101 +1,130 @@
-# 🎶 Spotipy Lyrics Finder
+# 🎧 TrackByLyrics 2.0
 
-A simple Flask web app that finds a song based on its lyrics using the Spotify API.
+_Developed by [Syed Mohammed Athiq](https://github.com/MohammedAthiq)_
+
+TrackByLyrics 2.0 is a **full-stack Flask web app** that helps users find songs from partial lyrics using the **Spotify Web API**.  
+It includes **user authentication**, **personalized search history**, and a clean, responsive interface.
 
 ---
 
 ## 🚀 Features
 
-- Input partial song lyrics
-- Searches for the best matching song
-- Displays:
-  - 🎵 Song name
-  - 🎤 Artist
-  - 🔗 Spotify link
+- 🔐 User login and signup (Flask + SQLite)  
+- 🎵 Search songs by entering partial lyrics  
+- 🕒 Saves user search history  
+- 🌙 Light/Dark theme toggle  
+- 🎧 Displays song name, artist, album art, and preview  
+- 🔗 Direct Spotify link integration  
+
+---
+
+## 🧠 Tech Stack
+
+**Frontend:** HTML, CSS, JavaScript  
+**Backend:** Flask (Python)  
+**Database:** SQLite  
+**API:** Spotify Web API  
+**Deployment:** Render  
 
 ---
 
 ## 🌐 Live Demo
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://spotify-song-finder-using-lyrics.onrender.com)
+**Live:** [https://trackbylyrics2-0.onrender.com](https://trackbylyrics2-0.onrender.com)
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Local Setup
 
-- Python 3
-- Flask (web framework)
-- Requests (HTTP client)
-- python-dotenv (for managing environment variables)
-- Spotify Web API (for track preview, album art, and Spotify link)
-- HTML + Jinja2 (template rendering)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/MohammedAthiq/TrackByLyrics-2.0.git
+   cd trackbylyrics2.0
+   ```
 
----
+2. **Create and activate a virtual environment**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-## 🧪 Local Setup
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 1. Clone the repo
+4. **Add environment variables**
+   Create a `.env` file in the project root:
+   ```env
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   SECRET_KEY=your_secret_key
+   DATABASE_PATH=trackbylyrics.db
+   ```
 
-```bash
-git clone https://github.com/MohammedAthiq/Spotify-Song-Finder-Web.git
-cd Spotify-Song-Finder-Web
-```
+5. **Initialize the database**
+   ```bash
+   python database.py
+   ```
 
-### 2. Create and activate a virtual environment
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Add environment variables
-
-Create a `.env` file and add your API keys:
-
-```env
-SPOTIPY_CLIENT_ID=your_client_id
-SPOTIPY_CLIENT_SECRET=your_client_secret
-```
-
-### 5. Run the app
-
-```bash
-python app.py
-```
-
-Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+6. **Run the app**
+   ```bash
+   python app.py
+   ```
+   Visit **http://127.0.0.1:5001**
 
 ---
 
 ## 📂 Project Structure
 
-```
-spotipy-web/
+```bash
+trackbylyrics2.0/
 ├── app.py
 ├── utils.py
+├── database.py
 ├── templates/
-│   └── index.html
-├── .env              # (not pushed to GitHub)
-├── .gitignore
+│   ├── index.html
+│   └── login.html
+├── static/
+│   ├── style.css
+│   └── script.js
 ├── requirements.txt
+├── .env (ignored)
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 🧾 License
+## 🚀 Deployment (Render)
 
-This project is open source and available under the [MIT License](LICENSE).
+1. Connect your GitHub repo to Render.  
+2. Add environment variables in **Settings**.  
+3. Add a **persistent disk** for SQLite:
+   - Mount path: `/opt/render/project/data`
+   - Env var: `DATABASE_PATH=/opt/render/project/data/trackbylyrics.db`
+4. **Build Command**
+   ```bash
+   pip install -r requirements.txt && python database.py
+   ```
+5. **Start Command**
+   ```bash
+   gunicorn app:app
+   ```
 
 ---
 
-## 💡 Future Improvements
+## 🌟 Future Enhancements
 
-- Deploy to Render / Vercel / Railway
-- Add YouTube preview or search link 
+- Migrate from SQLite to PostgreSQL  
+- Add a “My Search History” dashboard  
+- Integrate AI-based lyric suggestions  
+- Improve responsive UI  
+
+---
+
+## 📜 License
+
+Open source under the [MIT License](LICENSE).
+
+---
