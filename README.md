@@ -28,11 +28,6 @@ It now uses **Neon PostgreSQL** for cloud database storage, includes **user auth
 
 ---
 
-## 🌐 Live Demo
-
-**Live:** [https://trackbylyrics2-0.onrender.com](https://trackbylyrics2-0.onrender.com)
-
----
 
 ## ⚙️ Local Setup
 
