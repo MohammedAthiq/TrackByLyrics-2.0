@@ -1,48 +1,23 @@
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleButton = document.querySelector(".theme-toggle");
 
-async function searchSong() {
-    const query = document.getElementById("lyricsInput").value.trim();
-    const resultDiv = document.getElementById("result");
-
-    if (!query) {
-        resultDiv.innerHTML = "<p>Please enter some lyrics or a song name.</p>";
-        return;
+    // Apply saved theme globally
+    const currentTheme = localStorage.getItem("theme");
+    if (currentTheme === "dark") {
+        document.body.classList.add("dark");
+        if (toggleButton) toggleButton.textContent = "☀️ Light Mode";
+    } else {
+        document.body.classList.remove("dark");
+        if (toggleButton) toggleButton.textContent = "🌙 Dark Mode";
     }
 
-    resultDiv.innerHTML = "<p>🔎 Searching...</p>";
-
-    try {
-        const response = await fetch("/api/search", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ lyrics: query })
+    // Toggle theme on click and save preference
+    if (toggleButton) {
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            const isDark = document.body.classList.contains("dark");
+            toggleButton.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+            localStorage.setItem("theme", isDark ? "dark" : "light");
         });
-
-        const data = await response.json();
-
-        if (data.error) {
-            resultDiv.innerHTML = `<p>${data.error}</p>`;
-        } else {
-            resultDiv.innerHTML = `
-                <div class="song-card">
-                    <h2>${data.name}</h2>
-                    <p><strong>Artist:</strong> ${data.artist}</p>
-                    ${data.image ? `<img src="${data.image}" alt="Album Art">` : ""}
-                    <a href="${data.url}" class="spotify-link" target="_blank">🎧 Listen on Spotify</a>
-                    ${data.preview ? `
-                        <div class="preview">
-                            <p>🎵 Preview:</p>
-                            <audio controls>
-                                <source src="${data.preview}" type="audio/mpeg">
-                                Your browser does not support the audio element.
-                            </audio>
-                        </div>` : ""}
-                </div>
-            `;
-        }
-    } catch (error) {
-        resultDiv.innerHTML = "<p>⚠️ Something went wrong. Please try again later.</p>";
     }
-}
+});

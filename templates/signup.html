@@ -4,23 +4,64 @@
     <meta charset="UTF-8">
     <title>Signup | TrackByLyrics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+    body.dark {
+        background-color: #121212;
+        color: #f9f9f9;
+    }
+
+    body.dark .auth-container {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark input {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
+    }
+
+    body.dark input::placeholder {
+        color: #aaa;
+    }
+
+    body.dark button {
+        background-color: #1DB954;
+        color: #fff;
+    }
+
+    body.dark a {
+        color: #1DB954;
+    }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h1 class="project-title">🎧 TrackByLyrics</h1>
-        <p class="project-desc">
-            Discover songs by typing just their lyrics.<br>
-            Built with Flask, Spotify API & love for music.
-        </p>
+  <button class="theme-toggle">🌙 Dark Mode</button>
 
-        <h2>Create Account</h2>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="email" name="email" placeholder="Email" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
-            <button type="submit">Sign Up</button>
-        </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
-    </div>
+  <div class="auth-container">
+      <h1 class="project-title">🎧 TrackByLyrics</h1>
+      <p class="project-desc">
+          Discover songs by typing just their lyrics.<br>
+          Built with Flask, Spotify API & love for music.
+      </p>
+
+      <h2>Create Account</h2>
+      <form method="POST">
+          <input type="text" name="username" placeholder="Username" required><br>
+          <input type="email" name="email" placeholder="Email" required><br>
+          <input type="password" name="password" placeholder="Password" required><br>
+          <button type="submit">Sign Up</button>
+      </form>
+      <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  </div>
+
+  {% if session.get('user') %}
+  <div class="logout-container">
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+  </div>
+  {% endif %}
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

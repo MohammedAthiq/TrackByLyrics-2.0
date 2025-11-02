@@ -2,24 +2,183 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | TrackByLyrics</title>
+    <title>🎧 TrackByLyrics - Login / Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #121212;
+        }
+
+        .auth-box {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #1DB954;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            font-size: 1rem;
+            color: #121212;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #121212;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        input {
+            padding: 0.9rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 2px #1DB954;
+        }
+
+        button {
+            background-color: #1DB954;
+            color: white;
+            font-size: 1rem;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #17a44d;
+        }
+
+        .toggle-link {
+            color: #1DB954;
+            text-decoration: none;
+            margin-top: 1.2rem;
+            display: inline-block;
+            font-size: 0.95rem;
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: 2px solid #1DB954;
+            color: #1DB954;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: #1DB954;
+            color: white;
+        }
+
+        /* ----- Unified Dark Mode for Login Page ----- */
+        body.dark {
+            background-color: #121212;
+            color: #f9f9f9;
+        }
+
+        body.dark .auth-box {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark input {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        body.dark input::placeholder {
+            color: #aaa;
+        }
+
+        body.dark button {
+            background-color: #1DB954;
+            color: #fff;
+        }
+
+        body.dark .toggle-link {
+            color: #1DB954;
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h1 class="project-title">🎧 TrackByLyrics</h1>
-        <p class="project-desc">
-            Find any song using just a few words of its lyrics.<br>
-            Powered by Spotify API.
-        </p>
+  <button class="theme-toggle">🌙 Dark Mode</button>
 
-        <h2>Login</h2>
-        <form method="POST">
-            <input type="email" name="email" placeholder="Email" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
-            <button type="submit">Login</button>
-        </form>
-        <p>Don’t have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
-    </div>
+  <div class="auth-box">
+      <h1>🎧 TrackByLyrics</h1>
+      <p class="subtitle">Find any song using just a few words of its lyrics.<br>Powered by Spotify API.</p>
+
+      {% if error %}
+      <p class="error">{{ error }}</p>
+      {% endif %}
+
+      {% if request.path == '/signup' %}
+      <h2>Create Account</h2>
+      <form method="POST" action="{{ url_for('signup') }}">
+          <input type="text" name="username" placeholder="Username" required>
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="password" name="password" placeholder="Password" required>
+          <button type="submit">Sign Up</button>
+      </form>
+      <a href="{{ url_for('login') }}" class="toggle-link">Already have an account? Login</a>
+
+      {% else %}
+      <h2>Welcome Back</h2>
+      <form method="POST" action="{{ url_for('login') }}">
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="password" name="password" placeholder="Password" required>
+          <button type="submit">Login</button>
+      </form>
+      <a href="{{ url_for('signup') }}" class="toggle-link">Don’t have an account? Sign up</a>
+      {% endif %}
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

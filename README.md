@@ -2,18 +2,19 @@
 
 _Developed by [Syed Mohammed Athiq](https://github.com/MohammedAthiq)_
 
-TrackByLyrics 2.0 is a **full-stack Flask web app** that helps users find songs from partial lyrics using the **Spotify Web API**.  
-It includes **user authentication**, **personalized search history**, and a clean, responsive interface.
+TrackByLyrics 2.0 is a **full-stack Flask web app** that lets users find songs from partial lyrics using the **Spotify Web API**.  
+It now uses **Neon PostgreSQL** for cloud database storage, includes **user authentication**, and features a modern UI with **Dark/Light mode** support.
 
 ---
 
 ## 🚀 Features
 
-- 🔐 User login and signup (Flask + SQLite)  
-- 🎵 Search songs by entering partial lyrics  
-- 🌙 Light/Dark theme toggle  
-- 🎧 Displays song name, artist and album art
-- 🔗 Direct Spotify link integration  
+- 🔐 User login and signup (Flask + Neon PostgreSQL)  
+- 🎵 Search songs by partial lyrics using Spotify API  
+- 💾 Stores user search history in Neon cloud database  
+- 🌙 Dark/Light mode toggle   
+- 🎧 Displays song name, artist, album art, and Spotify link  
+- ☁️ Fully deployed on Render  
 
 ---
 
@@ -21,7 +22,7 @@ It includes **user authentication**, **personalized search history**, and a clea
 
 **Frontend:** HTML, CSS, JavaScript  
 **Backend:** Flask (Python)  
-**Database:** SQLite  
+**Database:** Neon PostgreSQL  
 **API:** Spotify Web API  
 **Deployment:** Render  
 
@@ -55,15 +56,15 @@ It includes **user authentication**, **personalized search history**, and a clea
 4. **Add environment variables**
    Create a `.env` file in the project root:
    ```env
-   SPOTIFY_CLIENT_ID=your_client_id
-   SPOTIFY_CLIENT_SECRET=your_client_secret
-   SECRET_KEY=your_secret_key
-   DATABASE_PATH=trackbylyrics.db
+   SPOTIFY_CLIENT_ID=your_spotify_client_id
+   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+   SECRET_KEY=your_flask_secret_key
+   DATABASE_URL=your_neon_postgres_url
    ```
 
 5. **Initialize the database**
    ```bash
-   python database.py
+   python test_db.py
    ```
 
 6. **Run the app**
@@ -83,7 +84,9 @@ trackbylyrics2.0/
 ├── database.py
 ├── templates/
 │   ├── index.html
-│   └── login.html
+│   ├── login.html
+│   ├── signup.html
+│   └── header.html
 ├── static/
 │   ├── style.css
 │   └── script.js
@@ -95,16 +98,14 @@ trackbylyrics2.0/
 
 ---
 
-## 🚀 Deployment (Render)
+## 🚀 Deployment (Render + Neon)
 
 1. Connect your GitHub repo to Render.  
-2. Add environment variables in **Settings**.  
-3. Add a **persistent disk** for SQLite:
-   - Mount path: `/opt/render/project/data`
-   - Env var: `DATABASE_PATH=/opt/render/project/data/trackbylyrics.db`
+2. Add environment variables in **Settings → Environment**.  
+3. Use **Neon PostgreSQL** for database (no disk required).  
 4. **Build Command**
    ```bash
-   pip install -r requirements.txt && python database.py
+   pip install -r requirements.txt
    ```
 5. **Start Command**
    ```bash
@@ -113,12 +114,23 @@ trackbylyrics2.0/
 
 ---
 
+## 🧩 Environment Variables on Render
+
+| Key | Description |
+|-----|--------------|
+| `SPOTIFY_CLIENT_ID` | Your Spotify API client ID |
+| `SPOTIFY_CLIENT_SECRET` | Your Spotify API secret |
+| `DATABASE_URL` | Your Neon PostgreSQL connection string |
+| `SECRET_KEY` | Flask secret key |
+
+---
+
 ## 🌟 Future Enhancements
 
-- Migrate from SQLite to PostgreSQL  
-- Add a “My Search History” dashboard  
-- Integrate AI-based lyric suggestions  
-- Improve responsive UI  
+- Add AI-based lyric similarity search  
+- Personalized recommendations  
+- “My History” dashboard  
+- Improved UI animations  
 
 ---
 

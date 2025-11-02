@@ -1,110 +1,120 @@
 import os
-import sqlite3
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import search_song
+from datetime import datetime
+from dotenv import load_dotenv
 
+load_dotenv()
+# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = "your_secret_key_here"
 
-# Database connection helper
-def get_db_connection():
-    conn = sqlite3.connect("trackbylyrics.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+# Load environment variables
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ------------------ AUTH ROUTES ------------------ #
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    if request.method == "POST":
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+# Initialize database
+db = SQLAlchemy(app)
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+# =========================
+# Database Models
+# =========================
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-        existing_user = cursor.fetchone()
-        if existing_user:
-            flash("Email already registered. Try logging in.")
-            conn.close()
-            return redirect(url_for("login"))
+class SearchHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    lyrics = db.Column(db.String(255), nullable=False)
+    song = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-        hashed_pw = generate_password_hash(password)
-        cursor.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-                       (username, email, hashed_pw))
-        conn.commit()
-        conn.close()
 
-        flash("Signup successful! Please log in.")
+# =========================
+# Routes
+# =========================
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if "user_id" not in session:
         return redirect(url_for("login"))
+    
+    result = None
+    if request.method == "POST":
+        lyrics = request.form["song"]
+        result = search_song(lyrics)
 
-    return render_template("signup.html")
+        if result and "name" in result:
+            # Save search to history
+            history = SearchHistory(
+                username=session["username"],
+                lyrics=lyrics,
+                song=result["name"]
+            )
+            db.session.add(history)
+            db.session.commit()
+
+    history_items = SearchHistory.query.filter_by(username=session["username"]).order_by(SearchHistory.timestamp.desc()).limit(5).all()
+    return render_template("index.html", result=result, history=history_items)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
+        user = User.query.filter_by(email=email).first()
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-        user = cursor.fetchone()
-        conn.close()
-
-        if user and check_password_hash(user["password"], password):
-            session["user"] = user["username"]
-            flash("Login successful!")
-            return redirect(url_for("dashboard"))
+        if user and check_password_hash(user.password, password):
+            session["user_id"] = user.id
+            session["username"] = user.username
+            return redirect(url_for("home"))
         else:
-            flash("Invalid credentials. Try again.")
-            return redirect(url_for("login"))
-
+            return render_template("login.html", error="Invalid credentials.")
+    
     return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        try:
+            username = request.form["username"]
+            email = request.form["email"]
+            password = generate_password_hash(request.form["password"])
+
+            existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+            if existing_user:
+                return render_template("login.html", error="User already exists. Please log in.")
+
+            new_user = User(username=username, email=email, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+
+            session["user_id"] = new_user.id
+            session["username"] = username
+            print(f"✅ New user created: {username}")
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"❌ Signup error: {e}")
+            return render_template("login.html", error="An unexpected error occurred.")
+    return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
-    flash("Logged out successfully.")
+    session.clear()
     return redirect(url_for("login"))
 
-# ------------------ MAIN APP ROUTES ------------------ #
-@app.route("/")
-def home():
-    if "user" in session:
-        return redirect(url_for("dashboard"))
-    return redirect(url_for("login"))
 
-@app.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect(url_for("login"))
-    return render_template("index.html", username=session["user"])
-
-@app.route("/api/search", methods=["POST"])
-def api_search():
-    if "user" not in session:
-        return jsonify({"error": "Please log in first."}), 403
-
-    data = request.get_json()
-    lyrics = data.get("lyrics", "")
-    if not lyrics:
-        return jsonify({"error": "Please provide lyrics"}), 400
-
-    result = search_song(lyrics)
-
-    # Store search in DB
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO search_history (user_email, query, result_song) VALUES (?, ?, ?)",
-        (session["user"], lyrics, result.get("name"))
-    )
-    conn.commit()
-    conn.close()
-
-    return jsonify(result)
+# =========================
+# Run App
+# =========================
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()  # Ensures tables exist in Neon DB
     app.run(host="0.0.0.0", port=5001, debug=True)

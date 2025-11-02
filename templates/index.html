@@ -2,15 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spotify Song Search</title>
+    <title>TrackByLyrics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    background: none;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.theme-toggle:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+    </style>
 </head>
 <body>
-    <header class="top-bar">
-        <h2 class="logo">🎧 TrackByLyrics</h2>
-        <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Dark Mode</button>
-    </header>
+    {% include 'header.html' %}
 
     {% if username %}
     <div class="welcome-banner">
@@ -23,13 +39,42 @@
         <h1>Find Songs by Lyrics</h1>
         <p class="subtitle">Type a few words from any song, and we’ll find it for you using the Spotify API.</p>
 
-        <div class="search-box">
-            <input type="text" id="lyricsInput" placeholder="Enter song name or lyrics" required>
-            <button onclick="searchSong()">Search</button>
-        </div>
+        <form method="POST" class="search-box">
+            <input type="text" name="song" placeholder="Enter song name or lyrics" required>
+            <button type="submit">Search</button>
+        </form>
 
-        <div id="result" class="result"></div>
+        {% if result %}
+        <div class="result">
+            <h2>Result:</h2>
+            {% if result.error %}
+                <p style="color: red;">{{ result.error }}</p>
+            {% else %}
+                <p><strong>Song:</strong> {{ result.name }}</p>
+                <p><strong>Artist:</strong> {{ result.artist }}</p>
+                <p><a href="{{ result.url }}" target="_blank">🔗 Open on Spotify</a></p>
+
+                {% if result.image %}
+                    <img src="{{ result.image }}" alt="Album Cover" style="max-width: 300px; border-radius: 10px; margin-top: 1rem;">
+                {% endif %}
+
+                {% if result.preview %}
+                    <div class="preview" style="margin-top: 1rem;">
+                        <p>🎵 Preview:</p>
+                        <audio controls>
+                            <source src="{{ result.preview }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
     </main>
+
+    <div class="logout-container">
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

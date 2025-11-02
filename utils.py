@@ -53,25 +53,34 @@ def get_access_token():
 
 
 def search_song(lyrics):
-    """Search for a song on Spotify using lyrics as a query."""
+    """Search for a song on Spotify using lyrics as a query, with detailed debugging."""
     token = get_access_token()
     if not token:
+        print("❌ Failed to obtain Spotify token. Check your credentials.")
         return {"error": "Failed to obtain Spotify token. Check your credentials."}
 
     try:
         headers = {"Authorization": f"Bearer {token}"}
         params = {"q": lyrics, "type": "track", "limit": 1}
+
+        print(f"🔍 Searching Spotify for lyrics: {lyrics}")
         response = requests.get("https://api.spotify.com/v1/search", headers=headers, params=params)
+        print(f"Spotify response status: {response.status_code}")
 
         if response.status_code != 200:
-            return {"error": f"Spotify API returned {response.status_code}"}
+            print(f"❌ Spotify API error: {response.text}")
+            return {"error": f"Spotify API returned {response.status_code}: {response.text}"}
 
         result = response.json()
         tracks = result.get("tracks", {}).get("items", [])
+
         if not tracks:
+            print("⚠️ No song found for this query.")
             return {"error": "No song found with those lyrics"}
 
         track = tracks[0]
+        print(f"✅ Found song: {track['name']} by {track['artists'][0]['name']}")
+
         return {
             "name": track["name"],
             "artist": track["artists"][0]["name"],
@@ -81,4 +90,5 @@ def search_song(lyrics):
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        print(f"❌ Exception in search_song: {e}")
+        return {"error": f"Unexpected error: {e}"}
