@@ -7,41 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Dark Mode</button>
+    <header class="top-bar">
+        <h2 class="logo">🎧 TrackByLyrics</h2>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Dark Mode</button>
+    </header>
 
-    <h1>🎧 Spotify Song Search</h1>
-    <form method="post">
-        <input type="text" name="song" placeholder="Enter song name or lyrics" required>
-        <button type="submit">Search</button>
-    </form>
-
-    {% if result %}
-    <div class="result">
-        <h2>Result:</h2>
-        <p><strong>Song:</strong> {{ result.name }}</p>
-        <p><strong>Artist:</strong> {{ result.artist }}</p>
-        <p><a href="{{ result.url }}" target="_blank">🔗 Open on Spotify</a></p>
-        
-        {% if result.image %}
-            <img src="{{ result.image }}" alt="Album Art">
-        {% endif %}
-
-        {% if result.preview %}
-            <div class="preview">
-                <p>🎵 Preview:</p>
-                <audio controls>
-                    <source src="{{ result.preview }}" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        {% endif %}
+    {% if username %}
+    <div class="welcome-banner">
+        <p>👋 Welcome, <strong>{{ username }}</strong>!</p>
+        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
     </div>
     {% endif %}
 
-    <script>
-        function toggleTheme() {
-            document.body.classList.toggle("dark");
-        }
-    </script>
+    <main class="dashboard-container">
+        <h1>Find Songs by Lyrics</h1>
+        <p class="subtitle">Type a few words from any song, and we’ll find it for you using the Spotify API.</p>
+
+        <div class="search-box">
+            <input type="text" id="lyricsInput" placeholder="Enter song name or lyrics" required>
+            <button onclick="searchSong()">Search</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
