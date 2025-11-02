@@ -9,10 +9,18 @@ from dotenv import load_dotenv
 load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'trackbylyrics_fallback_secret')
 
 # Load environment variables
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+# Load environment variables
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'trackbylyrics_fallback_secret')
+
+# Fix DATABASE_URL for SQLAlchemy compatibility
+database_url = os.getenv('DATABASE_URL', '')
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
